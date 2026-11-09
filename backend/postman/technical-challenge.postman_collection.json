@@ -112,6 +112,172 @@
           }
         }
       ]
+    },
+    {
+      "name": "Financial Score",
+      "description": "Run both login requests first so the environment contains userToken and adminToken.",
+      "item": [
+        {
+          "name": "Query own RUT as user",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"returns 200\", () => pm.response.to.have.status(200));",
+                  "const body = pm.response.json();",
+                  "pm.test(\"returns the requested RUT\", () => pm.expect(body.rut).to.eql(pm.environment.get(\"userRut\")));",
+                  "pm.test(\"returns a score between 0 and 100\", () => pm.expect(body.score).to.be.within(0, 100));",
+                  "pm.test(\"returns a valid date\", () => pm.expect(Date.parse(body.fecha)).not.to.be.NaN);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{userToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/score/{{userRut}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["score", "{{userRut}}"]
+            }
+          }
+        },
+        {
+          "name": "Reject another RUT as user",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"returns 403\", () => pm.response.to.have.status(403));",
+                  "pm.test(\"returns the authorization error\", () => pm.expect(pm.response.json()).to.eql({ success: false, message: \"You are not allowed to query this RUT\" }));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{userToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/score/{{otherRut}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["score", "{{otherRut}}"]
+            }
+          }
+        },
+        {
+          "name": "Query any RUT as admin",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"returns 200\", () => pm.response.to.have.status(200));",
+                  "const body = pm.response.json();",
+                  "pm.test(\"returns the requested RUT\", () => pm.expect(body.rut).to.eql(pm.environment.get(\"otherRut\")));",
+                  "pm.test(\"returns a score between 0 and 100\", () => pm.expect(body.score).to.be.within(0, 100));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/score/{{otherRut}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["score", "{{otherRut}}"]
+            }
+          }
+        },
+        {
+          "name": "Reject missing token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"returns 401\", () => pm.response.to.have.status(401));",
+                  "pm.test(\"returns the authentication error\", () => pm.expect(pm.response.json()).to.eql({ success: false, message: \"Invalid or expired token\" }));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/score/{{userRut}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["score", "{{userRut}}"]
+            }
+          }
+        },
+        {
+          "name": "Reject invalid RUT as admin",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"returns 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"returns the validation error\", () => pm.expect(pm.response.json()).to.eql({ success: false, message: \"Invalid RUT\" }));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/score/not-a-rut",
+              "host": ["{{baseUrl}}"],
+              "path": ["score", "not-a-rut"]
+            }
+          }
+        }
+      ]
     }
   ]
 }
