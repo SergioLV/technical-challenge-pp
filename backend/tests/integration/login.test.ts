@@ -18,6 +18,7 @@ const silentLogger: Logger = {
 function createTestApp() {
   return createApp({
     jwtSecret: testJwtSecret,
+    scoringAlgorithmSelection: "sha256",
     logger: silentLogger,
   });
 }
@@ -122,7 +123,11 @@ describe("POST /login", () => {
       warn: () => {},
       error: () => {},
     };
-    const app = createApp({ jwtSecret: testJwtSecret, logger });
+    const app = createApp({
+      jwtSecret: testJwtSecret,
+      scoringAlgorithmSelection: "sha256",
+      logger,
+    });
 
     const response = await request(app).post("/login").send({
       username: "user",
