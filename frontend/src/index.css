@@ -1,0 +1,60 @@
+@import "tailwindcss";
+
+:root {
+  /* ProntoPaga-inspired brand */
+  --color-brand: #f83f60;
+  --color-brand-hover: #e73354;
+  --color-primary-action: #c41e44;
+
+  /* Surfaces */
+  --color-background: #f8f9fb;
+  --color-surface: #ffffff;
+  --color-border: #e5e7eb;
+
+  /* Typography */
+  --color-text-primary: #242124;
+  --color-text-secondary: #64748b;
+
+  /* Semantic states */
+  --color-success: #15803d;
+  --color-error: #b91c1c;
+  --color-warning: #a16207;
+
+  /* Layout */
+  --radius-card: 12px;
+  --radius-input: 8px;
+
+  --font-family: Inter, system-ui, sans-serif;
+
+  color: var(--color-text-primary);
+  background: var(--color-background);
+  font-family: var(--font-family);
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+body {
+  min-width: 320px;
+  min-height: 100vh;
+  margin: 0;
+  background: var(--color-background);
+}
+
+button,
+input {
+  font: inherit;
+}
